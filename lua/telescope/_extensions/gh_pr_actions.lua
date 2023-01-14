@@ -71,6 +71,7 @@ local function checkout_pr_by_qf_action(pr_number)
       pr_number,
       '-b',
       'pr/' .. pr_number,
+      '-f',
     },
     on_stdout = on_output,
     on_stderr = on_output,
