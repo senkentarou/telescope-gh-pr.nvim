@@ -65,10 +65,10 @@ B.list = function()
       previewer = gh_pr_p.preview.new(opts),
       sorter = conf.file_sorter(opts),
       attach_mappings = function(_, map)
-        map("i", "o", gh_pr_a.view_web)
+        map("i", "<C-e>", gh_pr_a.checkout)
         actions.select_default:replace(gh_pr_a.view_web)
-          return true
-        end,
+        return true
+      end,
     }):find()
   end)
 end
