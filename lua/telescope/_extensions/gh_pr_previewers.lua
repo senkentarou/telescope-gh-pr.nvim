@@ -11,26 +11,17 @@ P.preview = defaulter(function(opts)
       return entry.value
     end,
 
-    define_preview = function(self, entry, status)
+    define_preview = function(self, entry, _)
       local tmp_table = vim.split(entry.value, "\t")
-      local gh_command = {
+      local command = {
         "gh",
         "pr",
         "view",
         tmp_table[1],
       }
       local filetype = "markdown"
-      if status.gh_pr_preview == "diff" then
-        gh_command = {
-          "gh",
-          "pr",
-          "diff",
-          tmp_table[1],
-        }
-        filetype = "diff"
-      end
 
-      putils.job_maker(gh_command, self.state.bufnr, {
+      putils.job_maker(command, self.state.bufnr, {
         value = entry.value .. filetype,
         bufname = self.state.bufname,
         cwd = opts.cwd,

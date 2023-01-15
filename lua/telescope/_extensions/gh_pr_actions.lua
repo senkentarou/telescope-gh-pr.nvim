@@ -1,38 +1,9 @@
 local actions = require 'telescope.actions'
 local action_state = require 'telescope.actions.state'
 local job = require 'plenary.job'
-
-local DEFAULT_OPTIONS = {
-  default_remote = 'origin',
-  default_branches = {
-    'main',
-    'master',
-    'develop',
-  },
-}
+local utils = require "telescope.utils"
 
 local A = {}
-
-local function run(command)
-  local handle = io.popen(command)
-  if handle ~= nil then
-    local result = handle:read("*a")
-    handle:close()
-
-    return string.gsub(result, '\n', ' ')
-  end
-end
-
-local function remote_base_url()
-  local git_remote_url = run('git ls-remote --get-url ' .. DEFAULT_OPTIONS.default_remote)
-  local url_base = string.gsub(git_remote_url, '^.-github.com[:/]?(.*)%.git%s?$', '%1')
-
-  if git_remote_url == url_base or #url_base <= 0 then
-    error('fatal: could not open remote url about \'' .. git_remote_url .. '\'')
-  end
-
-  return url_base
-end
 
 local function close_telescope_prompt(bufnr)
   local selection = action_state.get_selected_entry()
@@ -64,6 +35,7 @@ local function checkout_pr_by_qf_action(pr_number)
 
   local instance = job:new{
     enable_recording = true,
+    -- see: https://cli.github.com/manual/gh_pr_checkout
     command = 'gh',
     args = vim.tbl_flatten {
       'pr',
@@ -111,10 +83,21 @@ A.view_web = function(bufnr)
     return
   end
 
+  local git_remote_url = utils.get_os_command_output({
+    'git',
+    'ls-remote',
+    '--get-url',
+  })
+  local url_base = string.gsub(git_remote_url[1], '^.-github.com[:/]?(.*)%.git%s?$', '%1')
+
+  if git_remote_url == url_base or #url_base <= 0 then
+    error('fatal: could not open remote url about \'' .. git_remote_url .. '\'')
+  end
+
   -- bug: fork/exec /usr/bin/open: bad file descriptor
   -- os.execute('gh pr view --web ' .. pr_number)
   -- open only github pull
-  os.execute('open https://github.com/' .. remote_base_url() .. '/pull/' .. pr_number)
+  os.execute('open https://github.com/' .. url_base .. '/pull/' .. pr_number)
 end
 
 return A

@@ -11,6 +11,29 @@ local gh_pr_p = require "telescope._extensions.gh_pr_previewers"
 
 local B = {}
 
+local function parse_gh_pr_opts(opts)
+  local query = {}
+  local tmp_table = {
+    "assignee",
+    "label",
+    "search",
+    "state",
+    "base",
+    "limit",
+  }
+
+  for _, value in pairs(tmp_table) do
+    if opts[value] then
+      table.insert(query, {
+        "--" .. value,
+        opts[value],
+      })
+    end
+  end
+
+  return query
+end
+
 local function load_with_prompt(message, command, callback)
   local line = math.floor((vim.o.lines - 5) / 2)
   local width = math.floor(vim.o.columns / 1.5)
@@ -40,21 +63,25 @@ local function load_with_prompt(message, command, callback)
   end), 10)
 end
 
-B.list = function()
-  local command = {
-    'gh',
-    'pr',
-    'list',
-  }
-  local title = 'Pull Request List'
+B.list = function(opts)
+  opts = opts or {}
+  opts.limit = opts.limit or 100
 
+  -- see: https://cli.github.com/manual/gh_pr_list
+  local opts_query = parse_gh_pr_opts(opts)
+  local command = vim.tbl_flatten {
+    "gh",
+    "pr",
+    "list",
+    opts_query,
+  }
+
+  local title = 'Pull Request List'
   load_with_prompt('Loading ' .. title, command, function(results)
     if results[1] == '' then
       print('Empty ' .. title)
       return
     end
-
-    local opts = {}
 
     pickers.new(opts, {
       prompt_title = title,
@@ -66,6 +93,7 @@ B.list = function()
       sorter = conf.file_sorter(opts),
       attach_mappings = function(_, map)
         map("i", "<C-e>", gh_pr_a.checkout)
+        -- <CR> action
         actions.select_default:replace(gh_pr_a.view_web)
         return true
       end,
