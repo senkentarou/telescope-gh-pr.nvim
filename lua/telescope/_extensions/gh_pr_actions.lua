@@ -87,13 +87,14 @@ A.view_web = function(remote)
       return
     end
 
-    local git_remote_url = utils.get_os_command_output({
+    local git_ls_remote = utils.get_os_command_output({
       'git',
       'ls-remote',
       '--get-url',
       remote,
     })
-    local url_base = string.gsub(git_remote_url[1], '^.-github.com[:/]?(.*)%.git%s?$', '%1')
+    local git_remote_url = git_ls_remote[1]
+    local url_base = string.gsub(git_remote_url, '^.-github.com[:/]?(.*)%.git%s?$', '%1')
 
     if git_remote_url == url_base or #url_base <= 0 then
       error('fatal: could not open remote url about \'' .. git_remote_url .. '\'')
