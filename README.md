@@ -42,3 +42,6 @@ nvim --cmd "set rtp+=."
 
 ## License
 * MIT
+
+## Special thanks
+* This plugin was inspired by [telescope-github.nvim](https://github.com/nvim-telescope/telescope-github.nvim)
