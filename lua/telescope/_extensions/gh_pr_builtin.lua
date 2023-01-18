@@ -93,6 +93,7 @@ B.list = function(opts)
       sorter = conf.file_sorter(opts),
       attach_mappings = function(_, map)
         map("i", "<C-e>", gh_pr_a.checkout)
+        map("n", "e", gh_pr_a.checkout)
         -- <CR> action
         actions.select_default:replace(gh_pr_a.view_web)
         return true
