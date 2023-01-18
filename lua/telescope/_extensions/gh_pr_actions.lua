@@ -6,9 +6,12 @@ local utils = require "telescope.utils"
 local A = {}
 
 local function close_telescope_prompt(bufnr)
-  local selection = action_state.get_selected_entry()
-
   actions.close(bufnr)
+
+  local selection = action_state.get_selected_entry()
+  if selection == nil then
+    return
+  end
 
   local tmp_table = vim.split(selection.value, '\t')
   if vim.tbl_isempty(tmp_table) then
