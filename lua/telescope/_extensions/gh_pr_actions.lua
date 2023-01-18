@@ -55,7 +55,7 @@ local function checkout_pr_by_qf_action(pr_number)
         pcall(vim.schedule_wrap(function()
           vim.cmd [[cclose]]
         end))
-        print('Pull request completed')
+        print('Checkout pull request completed')
       end
     end,
   }
