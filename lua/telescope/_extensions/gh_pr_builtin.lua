@@ -83,6 +83,8 @@ B.list = function(opts)
       return
     end
 
+    local remote = opts.remote or 'origin'
+
     pickers.new(opts, {
       prompt_title = title,
       finder = finders.new_table {
@@ -95,7 +97,7 @@ B.list = function(opts)
         map("i", "<C-e>", gh_pr_a.checkout)
         map("n", "e", gh_pr_a.checkout)
         -- <CR> action
-        actions.select_default:replace(gh_pr_a.view_web)
+        actions.select_default:replace(gh_pr_a.view_web(remote))
         return true
       end,
     }):find()
