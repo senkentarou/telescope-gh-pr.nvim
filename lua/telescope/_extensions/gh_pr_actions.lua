@@ -79,28 +79,32 @@ A.checkout = function(bufnr)
   checkout_pr_by_qf_action(pr_number)
 end
 
-A.view_web = function(bufnr)
-  local pr_number = close_telescope_prompt(bufnr)
+A.view_web = function(remote)
+  return function(bufnr)
+    local pr_number = close_telescope_prompt(bufnr)
 
-  if pr_number == nil then
-    return
+    if pr_number == nil then
+      return
+    end
+
+    local git_ls_remote = utils.get_os_command_output({
+      'git',
+      'ls-remote',
+      '--get-url',
+      remote,
+    })
+    local git_remote_url = git_ls_remote[1]
+    local url_base = string.gsub(git_remote_url, '^.-github.com[:/]?(.*)%.git%s?$', '%1')
+
+    if git_remote_url == url_base or #url_base <= 0 then
+      error('fatal: could not open remote url about \'' .. git_remote_url .. '\'')
+    end
+
+    -- bug: fork/exec /usr/bin/open: bad file descriptor
+    -- os.execute('gh pr view --web ' .. pr_number)
+    -- open only github pull
+    os.execute('open https://github.com/' .. url_base .. '/pull/' .. pr_number)
   end
-
-  local git_remote_url = utils.get_os_command_output({
-    'git',
-    'ls-remote',
-    '--get-url',
-  })
-  local url_base = string.gsub(git_remote_url[1], '^.-github.com[:/]?(.*)%.git%s?$', '%1')
-
-  if git_remote_url == url_base or #url_base <= 0 then
-    error('fatal: could not open remote url about \'' .. git_remote_url .. '\'')
-  end
-
-  -- bug: fork/exec /usr/bin/open: bad file descriptor
-  -- os.execute('gh pr view --web ' .. pr_number)
-  -- open only github pull
-  os.execute('open https://github.com/' .. url_base .. '/pull/' .. pr_number)
 end
 
 return A
