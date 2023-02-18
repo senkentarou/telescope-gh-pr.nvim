@@ -70,7 +70,7 @@ local function checkout_pr_by_qf_action(pr_number)
 
   local timer = vim.loop.new_timer()
   timer:start(200, 0, vim.schedule_wrap(function()
-    instance:sync()
+    instance:sync(10000, 20)
   end))
 end
 
