@@ -5,8 +5,13 @@ local utils = require "telescope.utils"
 
 local A = {}
 
-local function close_telescope_prompt(bufnr)
-  actions.close(bufnr)
+local function select_on_prompt(args)
+  local with_close = args.with_close or true
+  local bufnr = args.bufnr or 0
+
+  if with_close == true then
+    actions.close(bufnr)
+  end
 
   local selection = action_state.get_selected_entry()
   if selection == nil then
@@ -70,7 +75,9 @@ local function checkout_pr_by_qf_action(pr_number)
 end
 
 A.checkout = function(bufnr)
-  local pr_number = close_telescope_prompt(bufnr)
+  local pr_number = select_on_prompt({
+    bufnr = bufnr,
+  })
 
   if pr_number == nil then
     return
@@ -81,7 +88,10 @@ end
 
 A.view_web = function(remote)
   return function(bufnr)
-    local pr_number = close_telescope_prompt(bufnr)
+    local pr_number = select_on_prompt({
+      bufnr = bufnr,
+      with_close = false,
+    })
 
     if pr_number == nil then
       return
