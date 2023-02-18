@@ -6,8 +6,8 @@ local utils = require "telescope.utils"
 local A = {}
 
 local function select_on_prompt(args)
-  local with_close = args.with_close or true
-  local bufnr = args.bufnr or 0
+  local with_close = args.with_close
+  local bufnr = args.bufnr
 
   if with_close == true then
     actions.close(bufnr)
